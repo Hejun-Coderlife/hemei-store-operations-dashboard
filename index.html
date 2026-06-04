@@ -813,13 +813,35 @@ function runM3(){
 }
 
 /* ============================ 导出 PNG / XLSX ============================ */
+function nextFrame(){return new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));}
+async function waitPosterReady(el){
+  await nextFrame();
+  if(document.fonts&&document.fonts.ready)await document.fonts.ready.catch(()=>{});
+  const imgs=[...el.querySelectorAll('img')];
+  await Promise.all(imgs.map(img=>{
+    if(img.complete&&img.naturalWidth>0)return Promise.resolve();
+    if(img.decode)return img.decode().catch(()=>{});
+    return new Promise(resolve=>{
+      img.addEventListener('load',resolve,{once:true});
+      img.addEventListener('error',resolve,{once:true});
+    });
+  }));
+  await nextFrame();
+  const rect=el.getBoundingClientRect();
+  if(rect.width<1||rect.height<1)throw new Error('海报还没有完成布局，请先生成报表后再导出');
+  return rect;
+}
 async function dlPNG(m){
   const el=document.getElementById('poster-'+m);if(!el)return;
   const btn=document.getElementById(m+'-png');const old=btn.innerHTML;btn.disabled=true;btn.innerHTML='<span class="spin" style="border-top-color:var(--accent)"></span>生成中';
   try{
     const bg=THEME[m]['--pbg'];
-    const canvas=await html2canvas(el,{scale:2,backgroundColor:bg,useCORS:true,logging:false});
-    canvas.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=pngName(m);a.click();URL.revokeObjectURL(a.href);});
+    const rect=await waitPosterReady(el);
+    const canvas=await html2canvas(el,{scale:2,backgroundColor:bg,useCORS:true,logging:false,width:Math.ceil(rect.width),height:Math.ceil(rect.height),windowWidth:Math.ceil(document.documentElement.clientWidth)});
+    canvas.toBlob(b=>{
+      if(!b){setMsg(m+'-msg','导出 PNG 失败：浏览器没有生成图片数据','err');return;}
+      const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=pngName(m);a.click();URL.revokeObjectURL(a.href);
+    });
   }catch(e){setMsg(m+'-msg','导出 PNG 失败：'+e.message,'err');}
   btn.disabled=false;btn.innerHTML=old;
 }
