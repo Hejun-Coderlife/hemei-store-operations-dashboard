@@ -9,7 +9,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Noto+Serif+SC:wght@500;600;700;900&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 :root{
   --bg:#0b0908; --bg2:#120f0d; --ink:#efe8d9; --ink2:#a69c8a; --ink3:#726a5b;
@@ -813,35 +812,127 @@ function runM3(){
 }
 
 /* ============================ 导出 PNG / XLSX ============================ */
-function nextFrame(){return new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));}
-async function waitPosterReady(el){
-  await nextFrame();
-  if(document.fonts&&document.fonts.ready)await document.fonts.ready.catch(()=>{});
-  const imgs=[...el.querySelectorAll('img')];
-  await Promise.all(imgs.map(img=>{
-    if(img.complete&&img.naturalWidth>0)return Promise.resolve();
-    if(img.decode)return img.decode().catch(()=>{});
-    return new Promise(resolve=>{
-      img.addEventListener('load',resolve,{once:true});
-      img.addEventListener('error',resolve,{once:true});
+function ellipsize(ctx,text,maxWidth){
+  text=String(text??'');
+  if(ctx.measureText(text).width<=maxWidth)return text;
+  let out=text;
+  while(out&&ctx.measureText(out+'…').width>maxWidth)out=out.slice(0,-1);
+  return out+'…';
+}
+function drawText(ctx,text,x,y,maxWidth,opt={}){
+  ctx.save();
+  ctx.font=opt.font||'14px -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif';
+  ctx.fillStyle=opt.color||'#241d14';
+  ctx.textAlign=opt.align||'left';
+  ctx.textBaseline=opt.baseline||'alphabetic';
+  const t=maxWidth?ellipsize(ctx,text,maxWidth):String(text??'');
+  ctx.fillText(t,x,y,maxWidth);
+  ctx.restore();
+}
+function nativePosterConfig(m){
+  if(m==='m1'){
+    const d=ST.m1.result;
+    return {
+      accent:THEME.m1['--pacc'],bg:THEME.m1['--pbg'],
+      kick:'HYMN 抖音运营报告 / Video Compliance',
+      title:'抖音号视频发布达标清单',
+      meta:`统计期间  ${fmtDot(d.startKey)} — ${fmtDot(d.endKey)}  ·  达标标准  周均 >2 优秀／≥1 合格／<1 不合格`,
+      stats:[['抖音号数',d.kpi.accounts],['视频总数',d.kpi.videos],['达标账号',d.kpi.pass,'#5a6e2f'],['不达标账号',d.kpi.fail,'#9c3a2c']],
+      cols:[['序号',58,'center'],['抖音号名称',300,'left'],['视频数量',86,'center'],['周均视频数',106,'center'],['状态',106,'left']],
+      rows:d.rows.map(r=>[String(r.seq).padStart(2,'0'),r.name,r.count,r.weekly.toFixed(1),r.status]),
+      note:'周均视频数 = 指定日期内视频数量 ÷ 日期跨度周数；本表按 42 家完整门店名单补全，缺数门店以 0 计入。'
+    };
+  }
+  if(m==='m2'){
+    const d=ST.m2.result,dateLine=document.getElementById('m2-date').value.trim();
+    return {
+      accent:THEME.m2['--pacc'],bg:THEME.m2['--pbg'],
+      kick:'HYMN 抖音运营报告 / Verification Ranking',
+      title:'抖音门店扫码核销排行',
+      meta:`${dateLine?('报表期间  '+dateLine+'  ·  '):''}按 42 家完整门店名单补全 · 0 核销门店列于末位`,
+      stats:[['核销订单',d.kpi.ord],['核销金额','¥'+amtNum(d.kpi.amt,d.allInt),THEME.m2['--pacc'],30],['有核销门店',d.kpi.active],['0 核销门店',d.kpi.zero,'#b3a890']],
+      cols:[['排名',64,'center'],['门店',350,'left'],['核销订单数',112,'center'],['核销金额',130,'right']],
+      rows:d.rows.map(r=>[String(r.rank).padStart(2,'0'),r.name,r.ord,'¥'+amtNum(r.amt,d.allInt)]),
+      note:'本表按 42 家完整门店名单补全；仅保留门店名称、核销订单数、核销金额。'
+    };
+  }
+  const d=ST.m3.result;
+  return {
+    accent:THEME.m3['--pacc'],bg:THEME.m3['--pbg'],
+    kick:'HYMN 抖音运营报告 / Review Rate',
+    title:'抖音团购核销评价率清单',
+    meta:`统计期间  ${fmtDot(d.startKey)} — ${fmtDot(d.endKey)}  ·  评价率 = 消费后评价 ÷ 核销订单`,
+    stats:[['核销订单',d.kpi.ord],['消费后评价',d.kpi.rev],['整体评价率',(d.kpi.rate*100).toFixed(1)+'%',THEME.m3['--pacc']],['0 评价门店',d.kpi.zero,'#9c3a2c']],
+    cols:[['门店',302,'left'],['核销订单',92,'center'],['消费后评价',104,'center'],['评价率',82,'center'],['判断',76,'left']],
+    rows:d.rows.map(r=>[r.name,r.ord,r.rev,r.ord>0?pctFmt(r.rate):'—',r.cls]),
+    note:'评价率 = 消费后评价数 ÷ 核销订单数；本表按 42 家完整门店名单补全，已隐藏门店ID、券码、图评、缺口等后台字段。'
+  };
+}
+function renderNativePoster(m){
+  const cfg=nativePosterConfig(m),S=2,W=772,bodyX=58,bodyW=W-116,rowH=36,headH=34;
+  const tableY=230,tableH=headH+cfg.rows.length*rowH,H=tableY+tableH+92;
+  const canvas=document.createElement('canvas');
+  canvas.width=W*S;canvas.height=H*S;
+  const ctx=canvas.getContext('2d');
+  ctx.scale(S,S);
+  ctx.fillStyle=cfg.bg;ctx.fillRect(0,0,W,H);
+  const grad=ctx.createLinearGradient(0,0,0,220);
+  grad.addColorStop(0,'rgba(255,255,255,.55)');grad.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=grad;ctx.fillRect(0,0,W,220);
+  ctx.fillStyle=cfg.accent;ctx.fillRect(0,0,W,4);
+  drawText(ctx,'赫',W-28,H-24,null,{font:'700 300px "Noto Serif SC", "Songti SC", serif',color:'rgba(36,29,20,.035)',align:'right'});
+  drawText(ctx,cfg.kick,bodyX,76,bodyW,{font:'600 11px Fraunces, Georgia, serif',color:cfg.accent});
+  drawText(ctx,cfg.title,bodyX,122,bodyW,{font:'600 34px "Noto Serif SC", "Songti SC", serif',color:'#241d14'});
+  drawText(ctx,cfg.meta,bodyX,150,bodyW,{font:'12px -apple-system, "PingFang SC", sans-serif',color:'#8a7f6c'});
+  ctx.fillStyle='rgba(36,29,20,.15)';ctx.fillRect(bodyX,174,bodyW,1);
+  ctx.fillStyle=cfg.accent;ctx.fillRect(bodyX,174,68,1);
+  const statY=204,statW=bodyW/4;
+  cfg.stats.forEach((s,i)=>{
+    const x=bodyX+i*statW;
+    if(i){ctx.fillStyle='rgba(36,29,20,.1)';ctx.fillRect(x,190,1,58);}
+    drawText(ctx,String(s[1]),x+16,220,statW-28,{font:`500 ${s[3]||42}px Fraunces, Georgia, serif`,color:s[2]||'#241d14'});
+    drawText(ctx,s[0],x+16,242,statW-28,{font:'11px -apple-system, "PingFang SC", sans-serif',color:'#8a7f6c'});
+  });
+  let x=bodyX,y=tableY;
+  ctx.fillStyle='rgba(36,29,20,.045)';ctx.fillRect(bodyX,y,bodyW,headH);
+  cfg.cols.forEach(c=>{
+    const tx=c[2]==='right'?x+c[1]-10:(c[2]==='center'?x+c[1]/2:x+10);
+    drawText(ctx,c[0],tx,y+22,c[1]-18,{font:'600 10.5px -apple-system, "PingFang SC", sans-serif',color:'#9c917c',align:c[2]});
+    x+=c[1];
+  });
+  y+=headH;
+  cfg.rows.forEach((r,ri)=>{
+    if(ri%2===1){ctx.fillStyle='rgba(255,255,255,.18)';ctx.fillRect(bodyX,y,bodyW,rowH);}
+    ctx.fillStyle='rgba(36,29,20,.08)';ctx.fillRect(bodyX,y+rowH-1,bodyW,1);
+    x=bodyX;
+    r.forEach((cell,ci)=>{
+      const c=cfg.cols[ci],align=c[2],tx=align==='right'?x+c[1]-10:(align==='center'?x+c[1]/2:x+10);
+      let color='#3a3024';
+      if(ci===0)color=ri<3?cfg.accent:'#b3a890';
+      if((m==='m1'&&ci===4)||(m==='m3'&&ci===4))color=(m==='m1'?STC[cell]:CLC[cell])||'#3a3024';
+      drawText(ctx,cell,tx,y+23,c[1]-18,{font:(ci===0?'500 17px Fraunces, Georgia, serif':'14px -apple-system, "PingFang SC", sans-serif'),color,align});
+      x+=c[1];
     });
-  }));
-  await nextFrame();
-  const rect=el.getBoundingClientRect();
-  if(rect.width<1||rect.height<1)throw new Error('海报还没有完成布局，请先生成报表后再导出');
-  return rect;
+    y+=rowH;
+  });
+  y+=30;
+  ctx.fillStyle='rgba(36,29,20,.12)';ctx.fillRect(bodyX,y,bodyW,1);
+  drawText(ctx,cfg.note,bodyX,y+28,bodyW,{font:'italic 11px -apple-system, "PingFang SC", sans-serif',color:'#9a8f7b'});
+  drawText(ctx,'HYMN',bodyX,y+58,120,{font:'600 16px Fraunces, Georgia, serif',color:'#241d14'});
+  drawText(ctx,'全 42 家门店 · 本地生成',bodyX+bodyW,y+58,220,{font:'10.5px -apple-system, "PingFang SC", sans-serif',color:'#a99b80',align:'right'});
+  return canvas;
+}
+function canvasToBlob(canvas){
+  return new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
 }
 async function dlPNG(m){
   const el=document.getElementById('poster-'+m);if(!el)return;
   const btn=document.getElementById(m+'-png');const old=btn.innerHTML;btn.disabled=true;btn.innerHTML='<span class="spin" style="border-top-color:var(--accent)"></span>生成中';
   try{
-    const bg=THEME[m]['--pbg'];
-    const rect=await waitPosterReady(el);
-    const canvas=await html2canvas(el,{scale:2,backgroundColor:bg,useCORS:true,logging:false,width:Math.ceil(rect.width),height:Math.ceil(rect.height),windowWidth:Math.ceil(document.documentElement.clientWidth)});
-    canvas.toBlob(b=>{
-      if(!b){setMsg(m+'-msg','导出 PNG 失败：浏览器没有生成图片数据','err');return;}
-      const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=pngName(m);a.click();URL.revokeObjectURL(a.href);
-    });
+    const canvas=renderNativePoster(m);
+    const b=await canvasToBlob(canvas);
+    if(!b){setMsg(m+'-msg','导出 PNG 失败：浏览器没有生成图片数据','err');return;}
+    const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=pngName(m);a.click();URL.revokeObjectURL(a.href);
   }catch(e){setMsg(m+'-msg','导出 PNG 失败：'+e.message,'err');}
   btn.disabled=false;btn.innerHTML=old;
 }
