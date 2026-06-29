@@ -389,7 +389,7 @@ details.aiset summary::-webkit-details-marker{display:none}
           <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2.5"/><path d="m10 9 5 3-5 3z" fill="currentColor" stroke="none"/></svg>
           <h3>视频发布达标</h3>
           <div class="en">Weekly Compliance</div>
-          <p>用生意经视频列表，按日期统计每个抖音号的视频数与周均频率，自动判定优秀 / 合格 / 不合格，揪出没发够的账号。</p>
+          <p>表格下载路径：生意经-流量-内容分析-视频分析-查看全部视频-官号视频-选择日期-导出数据-直接导出</p>
           <div class="tags"><span>生意经视频列表</span><span>周均 &gt;1 达标</span><span>香槟金</span></div>
           <div class="go">进入工具 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
         </div>
@@ -402,7 +402,7 @@ details.aiset summary::-webkit-details-marker{display:none}
           <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 20h16"/><rect x="5" y="11" width="3.5" height="7"/><rect x="10.2" y="6" width="3.5" height="12"/><rect x="15.4" y="13" width="3.5" height="5"/></svg>
           <h3>扫码核销排行</h3>
           <div class="en">Verification Ranking</div>
-          <p>读门店扫码明细，只取门店名称、核销订单数、核销金额，按订单数从高到低排行，补全 42 家完整名单。</p>
+          <p>表格下载路径：线下经营-线下数据-门店扫码明细-选择日期-导出数据</p>
           <div class="tags"><span>扫码核销明细</span><span>订单数排行</span><span>深海蓝</span></div>
           <div class="go">进入工具 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
         </div>
@@ -415,7 +415,7 @@ details.aiset summary::-webkit-details-marker{display:none}
           <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3 14.3 8.5 20 9l-4.3 3.9L17 19 12 15.8 7 19l1.3-6.1L4 9l5.7-.5z"/></svg>
           <h3>门店评价 · 图片评估</h3>
           <div class="en">Evaluation Studio</div>
-          <p>核销表 + 评价表生成「核销评价率清单」；另带上传图片让 AI 按 10 维评分、给改图建议的卖货力评估工具。</p>
+          <p>表格1：经营成长-评价管理-导出-导出评价-选择日期-导出<br>表格2：订单管理-交易查询-导出工具-核销明细-选择日期-确认</p>
           <div class="tags"><span>核销评价率清单</span><span>图片 AI 打分</span><span>暖色</span></div>
           <div class="go">进入工具 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
         </div>
@@ -607,7 +607,7 @@ function module1(rows,startKey,endKey,sortMode){
   const weeks=daysInclusive(startKey,endKey)/7,out=[],extraNames=[];
   const mk=(name,c)=>{const wk=c/weeks;return{name,count:c,weekly:wk,status:wk>2?'优秀':(wk>=1?'合格':'不合格')};};
   for(const s of MASTER_42)out.push(mk(s,counts[s]||0));
-  for(const nm of Object.keys(extras)){extraNames.push(nm);out.push(mk(nm,extras[nm]));}
+  for(const nm of Object.keys(extras))extraNames.push(nm);
   const P={优秀:0,合格:1,不合格:2},F={不合格:0,合格:1,优秀:2};
   if(sortMode==='followup')out.sort((a,b)=>F[a.status]-F[b.status]||a.weekly-b.weekly||a.name.localeCompare(b.name,'zh'));
   else out.sort((a,b)=>b.count-a.count||b.weekly-a.weekly||P[a.status]-P[b.status]||a.name.localeCompare(b.name,'zh'));
@@ -620,7 +620,7 @@ function module2(rows,sortMode){
   if(!cName||!cOrd||!cAmt)return{error:`缺少必要字段：${!cName?'门店名称 ':''}${!cOrd?'核销订单数 ':''}${!cAmt?'核销金额':''}`};
   const agg={};for(const r of rows){const nm=String(r[cName]||'').trim();if(!nm)continue;if(!agg[nm])agg[nm]={ord:0,amt:0};agg[nm].ord+=toNum(r[cOrd]);agg[nm].amt+=toNum(r[cAmt]);}
   const out=[],extras=[];for(const s of MASTER_42){const a=agg[s]||{ord:0,amt:0};out.push({name:s,ord:a.ord,amt:a.amt});}
-  for(const nm of Object.keys(agg))if(!MASTER_42.includes(nm)){extras.push(nm);out.push({name:nm,ord:agg[nm].ord,amt:agg[nm].amt});}
+  for(const nm of Object.keys(agg))if(!MASTER_42.includes(nm))extras.push(nm);
   const mi=n=>{const i=MASTER_42.indexOf(n);return i<0?999:i;};
   if(sortMode==='amount')out.sort((a,b)=>b.amt-a.amt||b.ord-a.ord||mi(a.name)-mi(b.name));
   else out.sort((a,b)=>{const az=a.ord===0,bz=b.ord===0;if(az!==bz)return az?1:-1;if(az&&bz)return mi(a.name)-mi(b.name);return b.ord-a.ord||b.amt-a.amt||mi(a.name)-mi(b.name);});
@@ -643,7 +643,7 @@ function module3a(vr,rr,startKey,endKey,onlyV){
   const cls=(o,rate)=>o===0?'无核销':(rate>=1?'优秀':(rate>=0.5?'不错':'加油'));
   const out=[],extras=[];
   for(const s of MASTER_42){const o=vc[s]||0,rv=rc[s]||0,rate=o>0?rv/o:0;out.push({name:s,ord:o,rev:rv,rate,cls:cls(o,rate)});}
-  const seen={...vc,...rc};for(const nm of Object.keys(seen))if(!MASTER_42.includes(nm)){extras.push(nm);const o=vc[nm]||0,rv=rc[nm]||0,rate=o>0?rv/o:0;out.push({name:nm,ord:o,rev:rv,rate,cls:cls(o,rate)});}
+  const seen={...vc,...rc};for(const nm of Object.keys(seen))if(!MASTER_42.includes(nm))extras.push(nm);
   const mi=n=>{const i=MASTER_42.indexOf(n);return i<0?999:i;};
   out.sort((a,b)=>{const az=a.ord===0,bz=b.ord===0;if(az!==bz)return az?1:-1;if(az&&bz)return mi(a.name)-mi(b.name);return b.rate-a.rate||b.ord-a.ord||mi(a.name)-mi(b.name);});
   const tO=out.reduce((s,r)=>s+r.ord,0),tR=out.reduce((s,r)=>s+r.rev,0);
@@ -790,7 +790,7 @@ function runM1(){
   ST.m1.result=d;
   const stage=document.getElementById('m1-stage');stage.style.alignItems='flex-start';stage.innerHTML=buildPosterM1(d);applyTheme(document.getElementById('poster-m1'),'m1');
   document.getElementById('m1-png').disabled=false;document.getElementById('m1-xlsx').disabled=false;
-  let ex=d.extras.length?`<br>名单外账号 <b>${d.extras.length}</b> 个已附在末尾：${d.extras.join('、')}`:'';
+  let ex=d.extras.length?`<br>名单外账号 <b>${d.extras.length}</b> 个未计入（仅统计固定 42 家）：${d.extras.join('、')}`:'';
   setMsg('m1-msg',`统计 <b>${fmtDot(d.startKey)}~${fmtDot(d.endKey)}</b>（约 ${d.weeks.toFixed(2)} 周）：抖音号 <b>${d.kpi.accounts}</b> 个，视频共 <b>${d.kpi.videos}</b> 条，达标 <b>${d.kpi.pass}</b>、不达标 <b>${d.kpi.fail}</b>。${ex}`,'ok');
 }
 function runM2(){
@@ -799,7 +799,7 @@ function runM2(){
   ST.m2.result=d;
   const stage=document.getElementById('m2-stage');stage.style.alignItems='flex-start';stage.innerHTML=buildPosterM2(d);applyTheme(document.getElementById('poster-m2'),'m2');
   document.getElementById('m2-png').disabled=false;document.getElementById('m2-xlsx').disabled=false;
-  let ex=d.extras.length?`<br>名单外门店 <b>${d.extras.length}</b> 家已附末尾：${d.extras.join('、')}`:'';
+  let ex=d.extras.length?`<br>名单外门店 <b>${d.extras.length}</b> 家未计入（仅统计固定 42 家）：${d.extras.join('、')}`:'';
   setMsg('m2-msg',`核销订单 <b>${d.kpi.ord}</b>，核销金额 <b>${moneyFmt(d.kpi.amt,d.allInt)}</b>；有核销 <b>${d.kpi.active}</b> 家，0 核销 <b>${d.kpi.zero}</b> 家，共 <b>${d.kpi.total}</b> 家。${ex}`,'ok');
 }
 function runM3(){
@@ -808,7 +808,7 @@ function runM3(){
   ST.m3.result=d;
   const stage=document.getElementById('m3-stage');stage.style.alignItems='flex-start';stage.innerHTML=buildPosterM3(d);applyTheme(document.getElementById('poster-m3'),'m3');
   document.getElementById('m3-png').disabled=false;document.getElementById('m3-xlsx').disabled=false;
-  let ex=d.extras.length?`<br>名单外门店 <b>${d.extras.length}</b> 家已附末尾：${d.extras.join('、')}`:'';
+  let ex=d.extras.length?`<br>名单外门店 <b>${d.extras.length}</b> 家未计入（仅统计固定 42 家）：${d.extras.join('、')}`:'';
   setMsg('m3-msg',`核销订单 <b>${d.kpi.ord}</b>，消费后评价 <b>${d.kpi.rev}</b>，整体评价率 <b>${pctFmt(d.kpi.rate)}</b>，0 评价门店 <b>${d.kpi.zero}</b> 家。统计区间 ${fmtDot(d.startKey)}~${fmtDot(d.endKey)}。${ex}`,'ok');
 }
 
