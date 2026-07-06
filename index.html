@@ -392,7 +392,7 @@ details.aiset summary::-webkit-details-marker{display:none}
           <h3>视频发布达标</h3>
           <div class="en">Weekly Compliance</div>
           <p>表格下载路径：生意经-流量-内容分析-视频分析-查看全部视频-官号视频-选择日期-导出数据-直接导出</p>
-          <div class="tags"><span>生意经视频列表</span><span>周均 &gt;1 达标</span><span>香槟金</span></div>
+          <div class="tags"><span>生意经视频列表</span><span>周均 ≥2 达标</span><span>香槟金</span></div>
           <div class="go">进入工具 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
         </div>
       </article>
@@ -461,7 +461,7 @@ details.aiset summary::-webkit-details-marker{display:none}
         </div>
         <div class="msg" id="m1-msg"></div>
       </div>
-      <div class="stage" id="m1-stage"><div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="4" width="20" height="16" rx="2.5"/><path d="m10 9 5 3-5 3z"/></svg><p>上传视频列表，生成达标清单海报</p><p class="s">优秀 &gt;2/周 · 合格 ≥1/周 · 不合格 &lt;1/周</p></div></div>
+      <div class="stage" id="m1-stage"><div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="4" width="20" height="16" rx="2.5"/><path d="m10 9 5 3-5 3z"/></svg><p>上传视频列表，生成达标清单海报</p><p class="s">优秀 &gt;2/周 · 合格 2/周 · 不合格 &lt;2/周</p></div></div>
     </div>
   </div>
 
@@ -607,14 +607,14 @@ function module1(rows,startKey,endKey,sortMode){
     if(cVid){const id=String(r[cVid]||'').trim();if(id){if(seen.has(nm+'|'+id))continue;seen.add(nm+'|'+id);}}
     const norm=normalizeName(nm,map);if(norm)counts[norm]=(counts[norm]||0)+1;else extras[nm]=(extras[nm]||0)+1;}
   const weeks=daysInclusive(startKey,endKey)/7,out=[],extraNames=[];
-  const mk=(name,c)=>{const wk=c/weeks;return{name,count:c,weekly:wk,status:wk>2?'优秀':(wk>=1?'合格':'不合格')};};
+  const mk=(name,c)=>{const wk=c/weeks;return{name,count:c,weekly:wk,status:wk>2?'优秀':(wk>=2?'合格':'不合格')};};
   for(const s of MASTER_42)out.push(mk(s,counts[s]||0));
   for(const nm of Object.keys(extras))extraNames.push(nm);
   const P={优秀:0,合格:1,不合格:2},F={不合格:0,合格:1,优秀:2};
   if(sortMode==='followup')out.sort((a,b)=>F[a.status]-F[b.status]||a.weekly-b.weekly||a.name.localeCompare(b.name,'zh'));
   else out.sort((a,b)=>b.count-a.count||b.weekly-a.weekly||P[a.status]-P[b.status]||a.name.localeCompare(b.name,'zh'));
   out.forEach((r,i)=>r.seq=i+1);
-  return{rows:out,kpi:{accounts:out.length,videos:out.reduce((s,r)=>s+r.count,0),pass:out.filter(r=>r.weekly>=1).length,fail:out.filter(r=>r.weekly<1).length},startKey,endKey,extras:extraNames,weeks};
+  return{rows:out,kpi:{accounts:out.length,videos:out.reduce((s,r)=>s+r.count,0),pass:out.filter(r=>r.weekly>=2).length,fail:out.filter(r=>r.weekly<2).length},startKey,endKey,extras:extraNames,weeks};
 }
 function module2(rows,sortMode){
   const h=Object.keys(rows[0]||{});
@@ -719,7 +719,7 @@ function buildPosterM1(d){
       <div class="p-watermark">赫</div>
       <div class="p-kick">HYMN 抖音运营报告 <span>/ Video Compliance</span></div>
       <div class="p-title">抖音号视频发布达标清单</div>
-      <div class="p-meta">统计期间　${fmtDot(d.startKey)} — ${fmtDot(d.endKey)}　·　达标标准　周均 &gt;2 优秀／≥1 合格／&lt;1 不合格</div>
+      <div class="p-meta">统计期间　${fmtDot(d.startKey)} — ${fmtDot(d.endKey)}　·　达标标准　周均 &gt;2 优秀／2 合格／&lt;2 不合格</div>
       <div class="p-rule"></div>
       <div class="p-stats">
         <div class="p-stat"><div class="sv">${d.kpi.accounts}</div><div class="sl">抖音号数</div></div>
