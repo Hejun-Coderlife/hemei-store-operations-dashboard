@@ -428,7 +428,7 @@ details.aiset summary::-webkit-details-marker{display:none}
       <span><i class="d"></i>读取 .xlsx / .xls / .csv</span>
       <span><i class="d"></i>导出 PNG 海报 + XLSX 汇总</span>
       <span><i class="d"></i>表格与图片均在本地处理</span>
-      <span><i class="d"></i>缺失门店按 0 补全到 42 家</span>
+      <span><i class="d"></i>缺失门店按 0 补全到 <span class="storeN"></span> 家</span>
     </div>
   </div>
 
@@ -494,7 +494,7 @@ details.aiset summary::-webkit-details-marker{display:none}
         </div>
         <div class="msg" id="m2-msg"></div>
       </div>
-      <div class="stage" id="m2-stage"><div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 20h16"/><rect x="5" y="11" width="3.5" height="7"/><rect x="10.2" y="6" width="3.5" height="12"/><rect x="15.4" y="13" width="3.5" height="5"/></svg><p>上传扫码明细，生成核销排行海报</p><p class="s">按 42 家完整名单补全 · 0 核销垫底</p></div></div>
+      <div class="stage" id="m2-stage"><div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 20h16"/><rect x="5" y="11" width="3.5" height="7"/><rect x="10.2" y="6" width="3.5" height="12"/><rect x="15.4" y="13" width="3.5" height="5"/></svg><p>上传扫码明细，生成核销排行海报</p><p class="s">按 <span class="storeN"></span> 家完整名单补全 · 0 核销垫底</p></div></div>
     </div>
   </div>
 
@@ -576,7 +576,9 @@ details.aiset summary::-webkit-details-marker{display:none}
 
 <script>
 /* ============================ 核心数据逻辑（已在本地验证） ============================ */
-const MASTER_42=["赫眉·自然堂(横街店)","赫眉(西坞店)","赫眉美妆连锁(金清店)","赫眉美妆(石浦店)","赫眉·自然堂(梅林店)","赫眉·美时百货(小港店)","赫眉(海曙龙湖天街店)","赫眉(鄞州万达店)","赫眉(慈城店)","赫眉·珀莱雅(洪塘海德广场店)","赫眉(海曙联丰路店)","赫眉(横峰店)","赫眉·欧莱雅(范市店)","赫眉(周巷嘉悦广场店)","赫眉·思美(邱隘店)","赫眉·珀莱雅(潘郎店)","赫眉(泗门东大街店)","赫眉(海曙恒一广场店)","赫眉(义桥店)","赫眉·自然堂(塘下店)","赫眉·珀莱雅(蓬街店)","赫眉(红联店)","赫眉·倾城护肤(邱隘店)","赫眉·珀莱雅(横溪店)","赫眉·自然堂(龙山店)","赫眉·自然堂(高塘店)","赫眉·珀莱雅(余姚泗门店)","赫眉·珀莱雅(低塘店)","赫眉·珀莱雅(崇寿店)","赫眉·珀莱雅(周巷店)","赫眉·珀莱雅(庄市店)","赫眉·珀莱雅(古林店)","赫眉(马渚店)","赫眉·华悦美妆(炼化店)","赫眉(姜山店)","赫眉·自然堂(柴桥店)","赫眉·珀莱雅(新河店)","赫眉(钱清店)","赫眉·珀莱雅(天元店)","赫眉皮肤管理连锁(奉化溪口)","赫眉皮肤管理(丈亭店)","赫眉·美妆星空(江北万达店)"];
+const MASTER_42=["赫眉(横街店)","赫眉(西坞店)","赫眉(金清店)","赫眉(石浦店)","赫眉(梅林店)","赫眉·美时百货(小港店)","赫眉(海曙龙湖天街店)","赫眉(鄞州万达店)","赫眉(慈城店)","赫眉(洪塘海德广场店)","赫眉(海曙联丰路店)","赫眉(横峰店)","赫眉(范市店)","赫眉(周巷嘉悦广场店)","赫眉(邱隘二店)","赫眉(潘郎店)","赫眉(泗门东大街店)","赫眉(海曙恒一广场店)","赫眉(义桥店)","赫眉(塘下店)","赫眉(蓬街店)","赫眉(红联店)","赫眉(邱隘店)","赫眉(横溪店)","赫眉(龙山店)","赫眉(高塘店)","赫眉·珀莱雅(余姚泗门店)","赫眉·珀莱雅(低塘店)","赫眉·珀莱雅(周巷店)","赫眉·珀莱雅(庄市店)","赫眉·珀莱雅(古林店)","赫眉(马渚店)","赫眉·华悦美妆(炼化店)","赫眉(姜山店)","赫眉·自然堂(柴桥店)","赫眉·珀莱雅(新河店)","赫眉(钱清店)","赫眉(天元店)","赫眉(奉化溪口店)","赫眉(丈亭店)","赫眉·美妆星空(江北万达店)","赫眉·珀莱雅(崇寿店)","赫眉(三横店)"];
+const STORE_N=MASTER_42.length;
+document.querySelectorAll('.storeN').forEach(e=>e.textContent=STORE_N);
 const pad=n=>String(n).padStart(2,'0');
 const locOf=name=>{const m=String(name).match(/[（(]([^（）()]*)[）)]/);return m?m[1].trim():''};
 function toDateKey(v){
@@ -729,8 +731,8 @@ function buildPosterM1(d){
       </div>
       <table class="p-table"><thead><tr><th class="ta-c" style="width:56px">序号</th><th>抖音号名称</th><th class="ta-c" style="width:94px">视频数量</th><th class="ta-c" style="width:106px">周均视频数</th><th style="width:102px">状态</th></tr></thead><tbody>${rows}</tbody></table>
       <div class="p-foot">
-        <div class="p-note">周均视频数 = 指定日期内视频数量 ÷ 日期跨度周数；本表按 42 家完整门店名单补全，缺数门店以 0 计入。</div>
-        <div class="p-sign"><img class="p-logo" src="${LOGO_DARK}" alt="赫眉 HYMN"><span class="ed">全 42 家门店 · 本地生成</span></div>
+        <div class="p-note">周均视频数 = 指定日期内视频数量 ÷ 日期跨度周数；本表按 ${STORE_N} 家完整门店名单补全，缺数门店以 0 计入。</div>
+        <div class="p-sign"><img class="p-logo" src="${LOGO_DARK}" alt="赫眉 HYMN"><span class="ed">全 ${STORE_N} 家门店 · 本地生成</span></div>
       </div>
     </div>
   </div>`;
@@ -744,7 +746,7 @@ function buildPosterM2(d){
       <div class="p-watermark">赫</div>
       <div class="p-kick">HYMN 抖音运营报告 <span>/ Verification Ranking</span></div>
       <div class="p-title">抖音门店扫码核销排行</div>
-      <div class="p-meta">${dateLine?('报表期间　'+dateLine+'　·　'):''}按 42 家完整门店名单补全 · 0 核销门店列于末位</div>
+      <div class="p-meta">${dateLine?('报表期间　'+dateLine+'　·　'):''}按 ${STORE_N} 家完整门店名单补全 · 0 核销门店列于末位</div>
       <div class="p-rule"></div>
       <div class="p-stats">
         <div class="p-stat"><div class="sv">${d.kpi.ord}</div><div class="sl">核销订单</div></div>
@@ -754,8 +756,8 @@ function buildPosterM2(d){
       </div>
       <table class="p-table"><thead><tr><th class="ta-c" style="width:66px">排名</th><th>门店</th><th class="ta-c" style="width:116px">核销订单数</th><th class="ta-r" style="width:152px">核销金额</th></tr></thead><tbody>${rows}</tbody></table>
       <div class="p-foot">
-        <div class="p-note">本表按 42 家完整门店名单补全；仅保留门店名称、核销订单数、核销金额。</div>
-        <div class="p-sign"><img class="p-logo" src="${LOGO_DARK}" alt="赫眉 HYMN"><span class="ed">全 42 家门店 · 本地生成</span></div>
+        <div class="p-note">本表按 ${STORE_N} 家完整门店名单补全；仅保留门店名称、核销订单数、核销金额。</div>
+        <div class="p-sign"><img class="p-logo" src="${LOGO_DARK}" alt="赫眉 HYMN"><span class="ed">全 ${STORE_N} 家门店 · 本地生成</span></div>
       </div>
     </div>
   </div>`;
@@ -778,8 +780,8 @@ function buildPosterM3(d){
       </div>
       <table class="p-table"><thead><tr><th>门店</th><th class="ta-c" style="width:108px">核销订单</th><th class="ta-c" style="width:118px">消费后评价</th><th class="ta-c" style="width:96px">评价率</th><th style="width:102px">判断</th></tr></thead><tbody>${rows}</tbody></table>
       <div class="p-foot">
-        <div class="p-note">评价率 = 消费后评价数 ÷ 核销订单数；本表按 42 家完整门店名单补全，已隐藏门店ID、券码、图评、缺口等后台字段。</div>
-        <div class="p-sign"><img class="p-logo" src="${LOGO_DARK}" alt="赫眉 HYMN"><span class="ed">全 42 家门店 · 本地生成</span></div>
+        <div class="p-note">评价率 = 消费后评价数 ÷ 核销订单数；本表按 ${STORE_N} 家完整门店名单补全，已隐藏门店ID、券码、图评、缺口等后台字段。</div>
+        <div class="p-sign"><img class="p-logo" src="${LOGO_DARK}" alt="赫眉 HYMN"><span class="ed">全 ${STORE_N} 家门店 · 本地生成</span></div>
       </div>
     </div>
   </div>`;
@@ -792,7 +794,7 @@ function runM1(){
   ST.m1.result=d;
   const stage=document.getElementById('m1-stage');stage.style.alignItems='flex-start';stage.innerHTML=buildPosterM1(d);applyTheme(document.getElementById('poster-m1'),'m1');
   document.getElementById('m1-png').disabled=false;document.getElementById('m1-xlsx').disabled=false;
-  let ex=d.extras.length?`<br>名单外账号 <b>${d.extras.length}</b> 个未计入（仅统计固定 42 家）：${d.extras.join('、')}`:'';
+  let ex=d.extras.length?`<br>名单外账号 <b>${d.extras.length}</b> 个未计入（仅统计固定 ${STORE_N} 家）：${d.extras.join('、')}`:'';
   setMsg('m1-msg',`统计 <b>${fmtDot(d.startKey)}~${fmtDot(d.endKey)}</b>（约 ${d.weeks.toFixed(2)} 周）：抖音号 <b>${d.kpi.accounts}</b> 个，视频共 <b>${d.kpi.videos}</b> 条，达标 <b>${d.kpi.pass}</b>、不达标 <b>${d.kpi.fail}</b>。${ex}`,'ok');
 }
 function runM2(){
@@ -801,7 +803,7 @@ function runM2(){
   ST.m2.result=d;
   const stage=document.getElementById('m2-stage');stage.style.alignItems='flex-start';stage.innerHTML=buildPosterM2(d);applyTheme(document.getElementById('poster-m2'),'m2');
   document.getElementById('m2-png').disabled=false;document.getElementById('m2-xlsx').disabled=false;
-  let ex=d.extras.length?`<br>名单外门店 <b>${d.extras.length}</b> 家未计入（仅统计固定 42 家）：${d.extras.join('、')}`:'';
+  let ex=d.extras.length?`<br>名单外门店 <b>${d.extras.length}</b> 家未计入（仅统计固定 ${STORE_N} 家）：${d.extras.join('、')}`:'';
   setMsg('m2-msg',`核销订单 <b>${d.kpi.ord}</b>，核销金额 <b>${moneyFmt(d.kpi.amt,d.allInt)}</b>；有核销 <b>${d.kpi.active}</b> 家，0 核销 <b>${d.kpi.zero}</b> 家，共 <b>${d.kpi.total}</b> 家。${ex}`,'ok');
 }
 function runM3(){
@@ -810,7 +812,7 @@ function runM3(){
   ST.m3.result=d;
   const stage=document.getElementById('m3-stage');stage.style.alignItems='flex-start';stage.innerHTML=buildPosterM3(d);applyTheme(document.getElementById('poster-m3'),'m3');
   document.getElementById('m3-png').disabled=false;document.getElementById('m3-xlsx').disabled=false;
-  let ex=d.extras.length?`<br>名单外门店 <b>${d.extras.length}</b> 家未计入（仅统计固定 42 家）：${d.extras.join('、')}`:'';
+  let ex=d.extras.length?`<br>名单外门店 <b>${d.extras.length}</b> 家未计入（仅统计固定 ${STORE_N} 家）：${d.extras.join('、')}`:'';
   setMsg('m3-msg',`核销订单 <b>${d.kpi.ord}</b>，消费后评价 <b>${d.kpi.rev}</b>，整体评价率 <b>${pctFmt(d.kpi.rate)}</b>，0 评价门店 <b>${d.kpi.zero}</b> 家。统计区间 ${fmtDot(d.startKey)}~${fmtDot(d.endKey)}。${ex}`,'ok');
 }
 
