@@ -264,6 +264,15 @@ details.aiset summary::-webkit-details-marker{display:none}
 .poster .p-rule{height:1px;background:linear-gradient(90deg,var(--pacc,#b0863a) 0 68px,rgba(36,29,20,.15) 68px);margin-top:24px}
 /* stats */
 .poster .p-stats{display:grid;grid-template-columns:repeat(4,1fr);margin:32px 0 6px}
+.poster .p-stat .sv.money{font-size:32px;line-height:1.3}
+.poster .p-stat .sv.money .cur{font-size:21px;color:#a99b80;margin-right:1px}
+.poster .p-table tbody tr.p-zero td{color:#bdb3a1}
+.pswitch{position:sticky;top:0;z-index:5;align-self:center;display:flex;gap:0;margin-bottom:20px;border:1px solid var(--line);
+  border-radius:9px;overflow:hidden;background:rgba(14,11,9,.92);backdrop-filter:blur(6px);box-shadow:0 6px 22px rgba(0,0,0,.5)}
+.pswitch button{padding:9px 22px;font-size:12.5px;color:var(--ink2);transition:.2s;border-right:1px solid var(--line)}
+.pswitch button:last-child{border-right:none}
+.pswitch button.on{background:var(--accent);color:#1a1410;font-weight:700}
+.stage .poster.hide{display:none}
 .poster .p-stat{padding-left:20px;border-left:1px solid rgba(36,29,20,.1)}
 .poster .p-stat:first-child{border-left:none;padding-left:0}
 .poster .p-stat .sv{font-family:var(--display);font-weight:500;font-size:42px;line-height:1;color:#241d14;font-feature-settings:"tnum" 1;letter-spacing:-.5px}
@@ -392,7 +401,7 @@ details.aiset summary::-webkit-details-marker{display:none}
           <h3>视频发布达标</h3>
           <div class="en">Weekly Compliance</div>
           <p>表格下载路径：生意经-流量-内容分析-视频分析-查看全部视频-官号视频-选择日期-导出数据-直接导出</p>
-          <div class="tags"><span>生意经视频列表</span><span>周均 ≥2 达标</span><span>香槟金</span></div>
+          <div class="tags"><span>生意经视频列表</span><span>周均 ≥4 达标</span><span>香槟金</span></div>
           <div class="go">进入工具 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
         </div>
       </article>
@@ -441,7 +450,7 @@ details.aiset summary::-webkit-details-marker{display:none}
     <div class="layout">
       <div class="panel">
         <h4>数据与参数</h4>
-        <div class="ph">上传「生意经_视频列表」，需含 抖音号名称、视频发布时间。</div>
+        <div class="ph">上传「生意经_视频列表」，需含 抖音号名称、视频发布时间；表内若有 视频直接成交券数／金额，将按门店汇总成交数量与金额。</div>
         <div class="field">
           <label>视频列表文件</label>
           <div class="drop" id="m1-drop"><svg class="di" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg><div class="dt">点击或拖入 <b>视频列表</b> 表格</div></div>
@@ -453,15 +462,17 @@ details.aiset summary::-webkit-details-marker{display:none}
         <div class="field">
           <label>排序方式</label>
           <div class="seg" id="m1-sort"><button class="on" data-v="default">视频数从多到少</button><button data-v="followup">不达标优先（待跟进）</button></div>
+          <div class="hint" style="margin-top:7px">仅影响达标图；成交图恒按成交金额从高到低</div>
         </div>
         <button class="gen" id="m1-gen" disabled onclick="runM1()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>生成达标清单图</button>
         <div class="dlrow">
-          <button class="dl" id="m1-png" disabled onclick="dlPNG('m1')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15V3M7 10l5 5 5-5"/><path d="M4 19h16"/></svg>下载 PNG</button>
+          <button class="dl" id="m1-png" disabled onclick="showPoster('m1');dlPNG('m1')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15V3M7 10l5 5 5-5"/><path d="M4 19h16"/></svg>达标图 PNG</button>
+          <button class="dl" id="m1s-png" disabled onclick="showPoster('m1s');dlPNG('m1','m1s')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15V3M7 10l5 5 5-5"/><path d="M4 19h16"/></svg>成交图 PNG</button>
           <button class="dl" id="m1-xlsx" disabled onclick="dlXLSX('m1')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h6"/></svg>下载 XLSX</button>
         </div>
         <div class="msg" id="m1-msg"></div>
       </div>
-      <div class="stage" id="m1-stage"><div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="4" width="20" height="16" rx="2.5"/><path d="m10 9 5 3-5 3z"/></svg><p>上传视频列表，生成达标清单海报</p><p class="s">优秀 &gt;2/周 · 合格 2/周 · 不合格 &lt;2/周</p></div></div>
+      <div class="stage" id="m1-stage"><div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="4" width="20" height="16" rx="2.5"/><path d="m10 9 5 3-5 3z"/></svg><p>上传视频列表，生成达标清单海报</p><p class="s">优秀 &gt;4/周 · 合格 4/周 · 不合格 &lt;4/周</p><p class="s">表内含成交列时，另出一张成交排行图</p></div></div>
     </div>
   </div>
 
@@ -578,6 +589,7 @@ details.aiset summary::-webkit-details-marker{display:none}
 /* ============================ 核心数据逻辑（已在本地验证） ============================ */
 const MASTER_42=["赫眉(横街店)","赫眉(西坞店)","赫眉(金清店)","赫眉(石浦店)","赫眉(梅林店)","赫眉·美时百货(小港店)","赫眉(海曙龙湖天街店)","赫眉(鄞州万达店)","赫眉(慈城店)","赫眉(洪塘海德广场店)","赫眉(海曙联丰路店)","赫眉(横峰店)","赫眉(范市店)","赫眉(周巷嘉悦广场店)","赫眉(邱隘二店)","赫眉(潘郎店)","赫眉(泗门东大街店)","赫眉(海曙恒一广场店)","赫眉(义桥店)","赫眉(塘下店)","赫眉(蓬街店)","赫眉(红联店)","赫眉(邱隘店)","赫眉(横溪店)","赫眉(龙山店)","赫眉(高塘店)","赫眉·珀莱雅(余姚泗门店)","赫眉·珀莱雅(低塘店)","赫眉·珀莱雅(周巷店)","赫眉·珀莱雅(庄市店)","赫眉·珀莱雅(古林店)","赫眉(马渚店)","赫眉·华悦美妆(炼化店)","赫眉(姜山店)","赫眉·自然堂(柴桥店)","赫眉·珀莱雅(新河店)","赫眉(钱清店)","赫眉(天元店)","赫眉(奉化溪口店)","赫眉(丈亭店)","赫眉·美妆星空(江北万达店)","赫眉·珀莱雅(崇寿店)","赫眉(三横店)"];
 const STORE_N=MASTER_42.length;
+const WK_TARGET=4;  /* 视频发布达标线：周均视频数，>WK_TARGET 优秀 / =WK_TARGET 合格 / <WK_TARGET 不合格 */
 document.querySelectorAll('.storeN').forEach(e=>e.textContent=STORE_N);
 const pad=n=>String(n).padStart(2,'0');
 const locOf=name=>{const m=String(name).match(/[（(]([^（）()]*)[）)]/);return m?m[1].trim():''};
@@ -600,23 +612,30 @@ const fmtDot=k=>k?k.replace(/-/g,'.'):'';
 function module1(rows,startKey,endKey,sortMode){
   const h=Object.keys(rows[0]||{});
   const cName=findCol(h,['抖音号名称','门店名称','账号名称','抖音号']),cTime=findCol(h,['视频发布时间','发布时间','视频时间']),cVid=findCol(h,['视频ID','视频id','videoid','视频编号']);
+  const cAmt=findCol(h,['视频直接成交金额','视频成交金额','成交金额']),cQty=findCol(h,['视频直接成交券数','成交券数','成交数量','成交单数']);
   if(!cName||!cTime)return{error:`缺少必要字段：${!cName?'抖音号名称 ':''}${!cTime?'视频发布时间':''}`};
   let keys=rows.map(r=>toDateKey(r[cTime])).filter(Boolean).sort();
   if(!startKey)startKey=keys[0]; if(!endKey)endKey=keys[keys.length-1];
   if(!startKey||!endKey)return{error:'未能从「视频发布时间」识别出有效日期，请检查列内容或手动指定日期范围'};
-  const map=buildMasterLocMap(),counts={},seen=new Set(),extras={};
+  const map=buildMasterLocMap(),counts={},amts={},qtys={},seen=new Set(),extras={};
   for(const r of rows){const nm=String(r[cName]||'').trim();if(!nm)continue;const k=toDateKey(r[cTime]);if(!k||k<startKey||k>endKey)continue;
     if(cVid){const id=String(r[cVid]||'').trim();if(id){if(seen.has(nm+'|'+id))continue;seen.add(nm+'|'+id);}}
-    const norm=normalizeName(nm,map);if(norm)counts[norm]=(counts[norm]||0)+1;else extras[nm]=(extras[nm]||0)+1;}
+    const norm=normalizeName(nm,map);
+    if(norm){counts[norm]=(counts[norm]||0)+1;if(cAmt)amts[norm]=(amts[norm]||0)+toNum(r[cAmt]);if(cQty)qtys[norm]=(qtys[norm]||0)+toNum(r[cQty]);}
+    else extras[nm]=(extras[nm]||0)+1;}
   const weeks=daysInclusive(startKey,endKey)/7,out=[],extraNames=[];
-  const mk=(name,c)=>{const wk=c/weeks;return{name,count:c,weekly:wk,status:wk>2?'优秀':(wk>=2?'合格':'不合格')};};
+  const r2=n=>Math.round(n*100)/100;
+  const mk=(name,c)=>{const wk=c/weeks;return{name,count:c,weekly:wk,amt:r2(amts[name]||0),qty:qtys[name]||0,status:wk>WK_TARGET?'优秀':(wk>=WK_TARGET?'合格':'不合格')};};
   for(const s of MASTER_42)out.push(mk(s,counts[s]||0));
   for(const nm of Object.keys(extras))extraNames.push(nm);
   const P={优秀:0,合格:1,不合格:2},F={不合格:0,合格:1,优秀:2};
   if(sortMode==='followup')out.sort((a,b)=>F[a.status]-F[b.status]||a.weekly-b.weekly||a.name.localeCompare(b.name,'zh'));
   else out.sort((a,b)=>b.count-a.count||b.weekly-a.weekly||P[a.status]-P[b.status]||a.name.localeCompare(b.name,'zh'));
   out.forEach((r,i)=>r.seq=i+1);
-  return{rows:out,kpi:{accounts:out.length,videos:out.reduce((s,r)=>s+r.count,0),pass:out.filter(r=>r.weekly>=2).length,fail:out.filter(r=>r.weekly<2).length},startKey,endKey,extras:extraNames,weeks};
+  const tAmt=r2(out.reduce((s,r)=>s+r.amt,0)),tQty=out.reduce((s,r)=>s+r.qty,0);
+  return{rows:out,hasSales:!!(cAmt||cQty),allInt:out.every(r=>Number.isInteger(r.amt)),
+    kpi:{accounts:out.length,videos:out.reduce((s,r)=>s+r.count,0),pass:out.filter(r=>r.weekly>=WK_TARGET).length,fail:out.filter(r=>r.weekly<WK_TARGET).length,qty:tQty,amt:tAmt,soldStores:out.filter(r=>r.amt>0||r.qty>0).length},
+    startKey,endKey,extras:extraNames,weeks};
 }
 function module2(rows,sortMode){
   const h=Object.keys(rows[0]||{});
@@ -700,6 +719,7 @@ wireDrop('m3-drop-img','image/*',f=>{const dz=document.getElementById('m3-drop-i
 /* ============================ 海报构建 ============================ */
 const THEME={
   m1:{'--pbg':'#f5efe3','--pacc':'#b0863a'},
+  m1s:{'--pbg':'#f2f0e5','--pacc':'#6b7c3a'},
   m2:{'--pbg':'#f1ede2','--pacc':'#3f6b78'},
   m3:{'--pbg':'#f5ece2','--pacc':'#a8623f'}
 };
@@ -721,7 +741,7 @@ function buildPosterM1(d){
       <div class="p-watermark">赫</div>
       <div class="p-kick">HYMN 抖音运营报告 <span>/ Video Compliance</span></div>
       <div class="p-title">抖音号视频发布达标清单</div>
-      <div class="p-meta">统计期间　${fmtDot(d.startKey)} — ${fmtDot(d.endKey)}　·　达标标准　周均 &gt;2 优秀／2 合格／&lt;2 不合格</div>
+      <div class="p-meta">统计期间　${fmtDot(d.startKey)} — ${fmtDot(d.endKey)}　·　达标标准　周均 &gt;${WK_TARGET} 优秀／${WK_TARGET} 合格／&lt;${WK_TARGET} 不合格</div>
       <div class="p-rule"></div>
       <div class="p-stats">
         <div class="p-stat"><div class="sv">${d.kpi.accounts}</div><div class="sl">抖音号数</div></div>
@@ -732,6 +752,34 @@ function buildPosterM1(d){
       <table class="p-table"><thead><tr><th class="ta-c" style="width:56px">序号</th><th>抖音号名称</th><th class="ta-c" style="width:94px">视频数量</th><th class="ta-c" style="width:106px">周均视频数</th><th style="width:102px">状态</th></tr></thead><tbody>${rows}</tbody></table>
       <div class="p-foot">
         <div class="p-note">周均视频数 = 指定日期内视频数量 ÷ 日期跨度周数；本表按 ${STORE_N} 家完整门店名单补全，缺数门店以 0 计入。</div>
+        <div class="p-sign"><img class="p-logo" src="${LOGO_DARK}" alt="赫眉 HYMN"><span class="ed">全 ${STORE_N} 家门店 · 本地生成</span></div>
+      </div>
+    </div>
+  </div>`;
+}
+function buildPosterM1S(d){
+  const sorted=d.rows.slice().sort((a,b)=>b.amt-a.amt||b.qty-a.qty||b.count-a.count||a.name.localeCompare(b.name,'zh'));
+  const rows=sorted.map((x,i)=>{
+    const z=!x.amt&&!x.qty,dim=z?' style="color:#bdb3a1"':'';
+    return `<tr${z?' class="p-zero"':''}><td class="ta-c">${pRank(i+1)}</td><td class="p-name"${dim}>${x.name}</td><td class="ta-c pnum"${dim}>${x.count}</td><td class="ta-c pnum"${dim}>${x.qty||'—'}</td><td class="ta-r"${dim}>${x.amt?`<span class="pcur">¥</span><span class="pnum">${amtNum(x.amt,d.allInt)}</span>`:'—'}</td></tr>`;
+  }).join('');
+  return `<div class="poster" id="poster-m1s">
+    <div class="p-accentbar"></div>
+    <div class="p-body">
+      <div class="p-watermark">赫</div>
+      <div class="p-kick">HYMN 抖音运营报告 <span>/ Video Sales</span></div>
+      <div class="p-title">抖音视频成交门店排行</div>
+      <div class="p-meta">统计期间　${fmtDot(d.startKey)} — ${fmtDot(d.endKey)}　·　口径　视频直接成交（不含种草价值）</div>
+      <div class="p-rule"></div>
+      <div class="p-stats">
+        <div class="p-stat"><div class="sv" style="color:#5a6e2f">${d.kpi.soldStores}</div><div class="sl">有成交门店</div></div>
+        <div class="p-stat"><div class="sv" style="color:#9c3a2c">${d.kpi.accounts-d.kpi.soldStores}</div><div class="sl">零成交门店</div></div>
+        <div class="p-stat"><div class="sv">${d.kpi.qty.toLocaleString('zh-CN')}</div><div class="sl">成交数量</div></div>
+        <div class="p-stat"><div class="sv money"><span class="cur">¥</span>${amtNum(d.kpi.amt,d.allInt)}</div><div class="sl">成交金额</div></div>
+      </div>
+      <table class="p-table"><thead><tr><th class="ta-c" style="width:56px">排名</th><th>抖音号名称</th><th class="ta-c" style="width:88px">视频数量</th><th class="ta-c" style="width:88px">成交数量</th><th class="ta-r" style="width:118px">成交金额</th></tr></thead><tbody>${rows}</tbody></table>
+      <div class="p-foot">
+        <div class="p-note">成交数量／金额取「视频直接成交券数／金额」，不含种草价值与引流直播间成交；本表按 ${STORE_N} 家完整门店名单补全，无成交门店以 — 列于末尾。</div>
         <div class="p-sign"><img class="p-logo" src="${LOGO_DARK}" alt="赫眉 HYMN"><span class="ed">全 ${STORE_N} 家门店 · 本地生成</span></div>
       </div>
     </div>
@@ -788,14 +836,26 @@ function buildPosterM3(d){
 }
 
 /* ============================ 运行各模块 ============================ */
+function showPoster(k){
+  const sw=document.getElementById('m1-pswitch');
+  if(sw)[...sw.querySelectorAll('button')].forEach((b,i)=>b.classList.toggle('on',(i===0)===(k==='m1')));
+  for(const id of ['poster-m1','poster-m1s']){const el=document.getElementById(id);if(el)el.classList.toggle('hide',id!=='poster-'+k);}
+  const st=document.getElementById('m1-stage');if(st)st.scrollTop=0;
+}
 function runM1(){
   const d=module1(ST.m1.rows,document.getElementById('m1-start').value||null,document.getElementById('m1-end').value||null,segVal('m1-sort'));
   if(d.error){setMsg('m1-msg',d.error,'err');return;}
   ST.m1.result=d;
-  const stage=document.getElementById('m1-stage');stage.style.alignItems='flex-start';stage.innerHTML=buildPosterM1(d);applyTheme(document.getElementById('poster-m1'),'m1');
+  const stage=document.getElementById('m1-stage');stage.style.flexDirection='column';stage.style.alignItems='center';stage.style.justifyContent='flex-start';
+  const sw=d.hasSales?`<div class="pswitch" id="m1-pswitch"><button class="on" onclick="showPoster('m1')">达标图</button><button onclick="showPoster('m1s')">成交图</button></div>`:'';
+  stage.innerHTML=sw+buildPosterM1(d)+(d.hasSales?buildPosterM1S(d):'');
+  applyTheme(document.getElementById('poster-m1'),'m1');
+  if(d.hasSales){applyTheme(document.getElementById('poster-m1s'),'m1s');showPoster('m1');}
   document.getElementById('m1-png').disabled=false;document.getElementById('m1-xlsx').disabled=false;
+  document.getElementById('m1s-png').disabled=!d.hasSales;
   let ex=d.extras.length?`<br>名单外账号 <b>${d.extras.length}</b> 个未计入（仅统计固定 ${STORE_N} 家）：${d.extras.join('、')}`:'';
-  setMsg('m1-msg',`统计 <b>${fmtDot(d.startKey)}~${fmtDot(d.endKey)}</b>（约 ${d.weeks.toFixed(2)} 周）：抖音号 <b>${d.kpi.accounts}</b> 个，视频共 <b>${d.kpi.videos}</b> 条，达标 <b>${d.kpi.pass}</b>、不达标 <b>${d.kpi.fail}</b>。${ex}`,'ok');
+  let sl=d.hasSales?`<br>成交 <b>${d.kpi.qty.toLocaleString('zh-CN')}</b> 单、金额 <b>¥${amtNum(d.kpi.amt,d.allInt)}</b>，其中 <b>${d.kpi.soldStores}</b> 家有成交（口径：视频直接成交，不含种草价值）。`:'<br>该表未找到成交金额/券数列，仅统计发布量。';
+  setMsg('m1-msg',`统计 <b>${fmtDot(d.startKey)}~${fmtDot(d.endKey)}</b>（约 ${d.weeks.toFixed(2)} 周）：抖音号 <b>${d.kpi.accounts}</b> 个，视频共 <b>${d.kpi.videos}</b> 条，达标 <b>${d.kpi.pass}</b>、不达标 <b>${d.kpi.fail}</b>。${sl}${ex}`,'ok');
 }
 function runM2(){
   const d=module2(ST.m2.rows,segVal('m2-sort'));
@@ -817,9 +877,10 @@ function runM3(){
 }
 
 /* ============================ 导出 PNG / XLSX ============================ */
-async function dlPNG(m){
-  const el=document.getElementById('poster-'+m);if(!el)return;
-  const btn=document.getElementById(m+'-png');const old=btn.innerHTML;btn.disabled=true;btn.innerHTML='<span class="spin" style="border-top-color:var(--accent)"></span>生成中';
+async function dlPNG(m,pk){
+  pk=pk||m;
+  const el=document.getElementById('poster-'+pk);if(!el)return;
+  const btn=document.getElementById(pk+'-png');const old=btn.innerHTML;btn.disabled=true;btn.innerHTML='<span class="spin" style="border-top-color:var(--accent)"></span>生成中';
   // 护栏：html2canvas 1.4.1 在这张海报上有多个脆弱点——0×0 画布调用 createPattern、
   // 非有限值的渐变坐标/色标——都会抛错中断导出。这里临时包一层把异常输入消毒，导出结束后还原。
   const C2=CanvasRenderingContext2D.prototype,CG=(window.CanvasGradient||{}).prototype;
@@ -836,26 +897,36 @@ async function dlPNG(m){
   C2.createRadialGradient=function(x0,y0,r0,x1,y1,r1){return _rad.call(this,_fin(x0,0),_fin(y0,0),Math.max(0,_fin(r0,0)),_fin(x1,0),_fin(y1,0),Math.max(0,_fin(r1,0)));};
   if(_stop)CG.addColorStop=function(off,col){let o=Number.isFinite(off)?off:0;o=o<0?0:o>1?1:o;return _stop.call(this,o,col);};
   try{
-    const bg=THEME[m]['--pbg'];
+    const bg=THEME[pk]['--pbg'];
     // 确保海报内所有图片（含 base64 logo）已解码
     await Promise.all([...el.querySelectorAll('img')].map(img=>(img.complete&&img.naturalWidth)?Promise.resolve():(img.decode?img.decode().catch(()=>{}):Promise.resolve())));
     const canvas=await html2canvas(el,{scale:2,backgroundColor:bg,useCORS:true,logging:false});
-    canvas.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=pngName(m);a.click();URL.revokeObjectURL(a.href);});
+    canvas.toBlob(b=>{const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=pngName(pk);a.click();URL.revokeObjectURL(a.href);});
   }catch(e){setMsg(m+'-msg','导出 PNG 失败：'+e.message,'err');}
   finally{C2.createPattern=_cp;C2.createLinearGradient=_lin;C2.createRadialGradient=_rad;if(_stop)CG.addColorStop=_stop;}
   btn.disabled=false;btn.innerHTML=old;
 }
 function pngName(m){
   if(m==='m1'){const d=ST.m1.result;return `抖音视频发布达标清单_${fmtDot(d.startKey)}-${fmtDot(d.endKey)}.png`;}
+  if(m==='m1s'){const d=ST.m1.result;return `抖音视频成交门店排行_${fmtDot(d.startKey)}-${fmtDot(d.endKey)}.png`;}
   if(m==='m2'){return `抖音门店扫码核销排行_${(document.getElementById('m2-date').value.trim()||'本期')}.png`;}
   const d=ST.m3.result;return `抖音团购核销评价率清单_${fmtDot(d.startKey)}-${fmtDot(d.endKey)}.png`;
 }
 function dlXLSX(m){
-  let aoa,name;
-  if(m==='m1'){const d=ST.m1.result;aoa=[['序号','抖音号名称','视频数量','周均视频数','状态'],...d.rows.map(r=>[r.seq,r.name,r.count,+r.weekly.toFixed(1),r.status])];name=`抖音视频发布达标_${fmtDot(d.startKey)}-${fmtDot(d.endKey)}.xlsx`;}
+  let aoa,name,sheets=null;
+  if(m==='m1'){const d=ST.m1.result;
+    aoa=[['序号','抖音号名称','视频数量','周均视频数','状态'],...d.rows.map(r=>[r.seq,r.name,r.count,+r.weekly.toFixed(1),r.status])];
+    if(d.hasSales){
+      const sorted=d.rows.slice().sort((a,b)=>b.amt-a.amt||b.qty-a.qty||b.count-a.count||a.name.localeCompare(b.name,'zh'));
+      sheets=[['发布达标',aoa],
+              ['成交排行',[['排名','抖音号名称','视频数量','成交数量','成交金额'],...sorted.map((r,i)=>[i+1,r.name,r.count,r.qty,r.amt])]]];
+    }
+    name=`抖音视频发布达标_${fmtDot(d.startKey)}-${fmtDot(d.endKey)}.xlsx`;}
   else if(m==='m2'){const d=ST.m2.result;aoa=[['排名','门店名称','核销订单数','核销金额'],...d.rows.map(r=>[r.rank,r.name,r.ord,d.allInt?r.amt:+r.amt.toFixed(2)])];name=`抖音门店扫码核销排行_${(document.getElementById('m2-date').value.trim()||'本期')}.xlsx`;}
   else{const d=ST.m3.result;aoa=[['门店','核销订单','消费后评价','评价率','判断'],...d.rows.map(r=>[r.name,r.ord,r.rev,r.ord>0?pctFmt(r.rate):'—',r.cls])];name=`抖音团购核销评价率_${fmtDot(d.startKey)}-${fmtDot(d.endKey)}.xlsx`;}
-  const ws=XLSX.utils.aoa_to_sheet(aoa);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'汇总');XLSX.writeFile(wb,name);
+  const wb=XLSX.utils.book_new();
+  for(const [t,a] of (sheets||[['汇总',aoa]]))XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(a),t);
+  XLSX.writeFile(wb,name);
 }
 
 /* ============================ 图片 AI 评估 ============================ */
