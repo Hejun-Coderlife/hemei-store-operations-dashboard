@@ -360,7 +360,7 @@ details.aiset summary::-webkit-details-marker{display:none}
       <span class="brand-div"></span>
       <span class="brand-tag"><b>运营图表台</b><small>OPS STUDIO</small></span>
     </div>
-    <div class="meta"><span class="pip"></span>本地运算 · 数据不上传 · <b>42</b> 家门店</div>
+    <div class="meta"><span class="pip"></span>本地运算 · 数据不上传 · <b data-storen>42</b> 家门店</div>
   </div>
 
   <!-- ============ HOME ============ -->
@@ -381,7 +381,7 @@ details.aiset summary::-webkit-details-marker{display:none}
     </section>
 
     <section class="stats reveal">
-      <div class="stat"><span class="snum" data-count="42">0</span><span class="slabel">门店主名单</span></div>
+      <div class="stat"><span class="snum" data-storen data-count="42">0</span><span class="slabel">门店主名单</span></div>
       <div class="stat"><span class="snum" data-count="3">0</span><span class="slabel">独立工具</span></div>
       <div class="stat"><span class="snum" data-count="10">0</span><span class="slabel">图片评估维度</span></div>
       <div class="stat"><span class="snum" data-count="100">0<small>%</small></span><span class="slabel">本地运算</span></div>
@@ -1001,6 +1001,11 @@ setTimeout(function(){var i=document.getElementById('intro');if(i){i.style.opaci
   document.addEventListener('mouseover',e=>{if(e.target.closest&&e.target.closest(sel))ring.classList.add('big');});
   document.addEventListener('mouseout',e=>{if(e.target.closest&&e.target.closest(sel))ring.classList.remove('big');});
 })();
+
+/* 门店数以 MASTER_42 名单长度为准，统一回填到页面（避免各处硬编码不同步） */
+document.querySelectorAll('[data-storen]').forEach(el=>{
+  if(el.hasAttribute('data-count'))el.dataset.count=STORE_N; else el.textContent=STORE_N;
+});
 
 /* ========================= 滚动揭示 ========================= */
 (function(){
